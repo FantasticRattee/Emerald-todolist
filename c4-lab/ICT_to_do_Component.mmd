@@ -1,0 +1,33 @@
+C4Component
+    title Component diagram for ICT To Do List - Web API
+
+    Container(web_app, "Web App", "React", "Single Page Application")
+    Container(mobile_app, "Mobile App", "Flutter", "Mobile Application")
+    ContainerDb(database, "Database", "PostgreSQL", "Stores user profiles, tasks, sync settings.")
+    Container(connector, "MyCourses Connector", "Python Service", "Internal service to fetch external data.")
+
+    Container_Boundary(web_api, "Web API") {
+        Component(auth_comp, "Authentication & Authorization", "Module", "Handles login, token validation, and access control checks.")
+        Component(task_comp, "Task Management", "Module", "Handles CRUD operations for manual and imported tasks.")
+        Component(sync_orch, "MyCourses Sync Orchestrator", "Module", "Manages the sync workflow and updates tasks.")
+        Component(mycourses_client, "MyCourses Client", "Module", "Interface to communicate with the Connector service.")
+        Component(mapping_comp, "Mapping Component", "Module", "Converts MyCourses data into internal task model.")
+        Component(sync_hist, "Sync History", "Module", "Records sync outcomes for admin monitoring.")
+        Component(data_access, "Data Access", "Module", "Repository functions for PostgreSQL access.")
+    }
+
+    Rel(web_app, auth_comp, "Authenticates", "JSON/HTTPS")
+    Rel(mobile_app, auth_comp, "Authenticates", "JSON/HTTPS")
+    Rel(web_app, task_comp, "Manages tasks", "JSON/HTTPS")
+    Rel(mobile_app, task_comp, "Manages tasks", "JSON/HTTPS")
+    Rel(web_app, sync_orch, "Triggers Sync", "JSON/HTTPS")
+
+    Rel(task_comp, data_access, "Reads/Writes tasks")
+    Rel(sync_orch, mycourses_client, "Requests assignments")
+    Rel(sync_orch, mapping_comp, "Maps data")
+    Rel(sync_orch, data_access, "Updates imported tasks")
+    Rel(sync_orch, sync_hist, "Logs result")
+    Rel(sync_hist, data_access, "Writes logs")
+    
+    Rel(mycourses_client, connector, "Calls", "Internal HTTP")
+    Rel(data_access, database, "SQL", "SQLAlchemy")

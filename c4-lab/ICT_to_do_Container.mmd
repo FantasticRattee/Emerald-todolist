@@ -1,0 +1,30 @@
+C4Container
+    title Container diagram for ICT To Do List
+
+    Person(student, "Student", "Main user who manages the task list, views assignments, and tracks submission status.")
+    Person(instructor, "Instructor", "Views teaching related tasks and assignment deadlines.")
+    Person(admin, "System Administrator", "Manages system configuration and monitors sync health.")
+
+    System_Ext(mycourses, "MyCourses", "External ICT e-learning system source of truth for assignments.")
+
+    Container_Boundary(c1, "ICT To Do List") {
+        Container(web_app, "Web App", "React", "Single Page Application for task management and admin interface.")
+        Container(mobile_app, "Mobile App", "Flutter", "Cross-platform mobile application for Android and iOS.")
+        Container(web_api, "Web API", "Python FastAPI", "Backend service exposing REST endpoints and handling business logic.")
+        ContainerDb(database, "Database", "PostgreSQL", "Stores user profiles, tasks, sync settings, and sync history.")
+        Container(connector, "MyCourses Connector", "Python Service", "Integration module that retrieves data from MyCourses.")
+    }
+
+    Rel(student, web_app, "Uses", "HTTPS")
+    Rel(student, mobile_app, "Uses")
+    Rel(instructor, web_app, "Uses", "HTTPS")
+    Rel(instructor, mobile_app, "Uses")
+    Rel(admin, web_app, "Uses", "HTTPS")
+
+    Rel(web_app, web_api, "Makes API calls to", "JSON/HTTPS")
+    Rel(mobile_app, web_api, "Makes API calls to", "JSON/HTTPS")
+    
+    Rel(web_api, database, "Reads from and writes to", "SQL/SQLAlchemy")
+    Rel(web_api, connector, "Triggers sync via", "Internal HTTP/RPC")
+    
+    Rel(connector, mycourses, "Retrieves assignments and status", "HTTPS/JSON")
